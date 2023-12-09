@@ -1,28 +1,34 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			favorites: []
 		},
 		actions: {
+			delFavorite: (char) => {
+				let aux = getStore().favorites.filter(el => el != char)
+				setStore({ favorites: aux })
+			},
+			addRemoveFav: (char) => {
+				if (getStore().favorites.length > 0) {
+					getStore().favorites.includes(char) ? getActions().delFavorite(char)
+						: setStore({ favorites: [...getStore().favorites, char] })
+				} else {
+					setStore({ favorites: [char] })
+				}
+			},
 			// Use getActions to call a function within a fuction
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
 			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+				fetch("https://rickandmortyapi.com/api/character").then(resp => resp.json()).then(data => setStore({ characters: data.results })).catch(error => console.log(error))
+			},
+			loadSingleCharacter: (id) => {
+				fetch("https://rickandmortyapi.com/api/character/" + id).then(resp => resp.json())
+					.then(data =>
+						setStore({ singleCharacter: data })
+					)
+					.catch(error => console.log(error))
 			},
 			changeColor: (index, color) => {
 				//get the store
